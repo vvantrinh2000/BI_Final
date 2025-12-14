@@ -156,6 +156,96 @@ margin: 10px 0;
     background-position: center;
 }
 
+
+/* =======================
+   Mobile-first improvements
+   (added for responsive design)
+   ======================= */
+:root{
+  --pad-page: 20px;
+  --pad-card: 15px;
+  --gap: 20px;
+}
+
+.insights-container, .insights-box { max-width: 1100px; margin-left: auto; margin-right: auto; }
+
+.chart-grid > div { min-width: 0; } /* prevent overflow in grid items */
+
+/* Give charts a predictable height so Plotly doesn't collapse on mobile */
+#dashboard-chart-1, #dashboard-chart-2,
+#financial-chart-1, #financial-chart-2, #financial-chart-3,
+#market-chart-1, #market-chart-2 {
+  width: 100%;
+  min-height: 420px;
+}
+
+/* Improve tab usability on small screens: horizontal swipe instead of cramped wrapping */
+.tabs{
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+@media (max-width: 900px){
+  .tabs{
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    flex-wrap: nowrap;
+  }
+  .tab-button{
+    flex: 0 0 auto;              /* allow horizontal scroll */
+    white-space: nowrap;
+    border-right: 1px solid #555;
+    border-bottom: none;
+  }
+}
+
+/* Fine-tune layout for phones */
+@media (max-width: 600px) {
+  :root{
+    --pad-page: 14px;
+    --pad-card: 12px;
+    --gap: 14px;
+  }
+
+  .header{ padding: 12px 14px; }
+  .header h1{ font-size: 18px; line-height: 1.25; }
+
+  .tab-content{ padding: var(--pad-page); }
+
+  .kpi-container{
+    flex-direction: column;
+    gap: var(--gap);
+    margin-bottom: 10px;
+  }
+  .kpi-card{
+    margin: 0;
+    padding: var(--pad-card);
+  }
+  .kpi-card p{ font-size: 20px; }
+
+  /* one-column charts and a bit less vertical whitespace */
+  .chart-grid{
+    grid-template-columns: 1fr;
+    gap: var(--gap);
+  }
+
+  /* Make charts shorter on phones */
+  #dashboard-chart-1, #dashboard-chart-2,
+  #financial-chart-1, #financial-chart-2, #financial-chart-3,
+  #market-chart-1, #market-chart-2 {
+    min-height: 320px;
+  }
+
+  /* Ensure the embedded image block behaves nicely */
+  #financial-chart-img{
+    min-height: 260px;
+  }
+
+  .section-title{ margin-top: 22px; }
+  .chart-result-text{ margin-bottom: 18px; }
+}
+
+
 </style>
 </head>
 <body>
@@ -602,6 +692,24 @@ margin: 10px 0;
             { date: '2024-01-02 00:00:00', close: 8.56, volume: 11200 },
         ];
         
+        
+        // --- Plotly responsive helper (added) ---
+        const PLOTLY_CONFIG = { responsive: true, displayModeBar: false };
+
+        function resizeAllPlots() {
+            const ids = [
+              'dashboard-chart-1','dashboard-chart-2',
+              'financial-chart-1','financial-chart-2','financial-chart-3',
+              'market-chart-1','market-chart-2'
+            ];
+            ids.forEach(id => {
+              const el = document.getElementById(id);
+              if (el && el.data) {
+                try { Plotly.Plots.resize(el); } catch(e) {}
+              }
+            });
+        }
+
         // --- Tab Control Functions (Unchanged) ---
         function openTab(evt, tabName) {
             var tabcontent = document.getElementsByClassName("tab-content");
@@ -617,7 +725,7 @@ margin: 10px 0;
             document.getElementById(tabName).classList.add("active");
             evt.currentTarget.className += " active";
             if (tabName === 'Financial' || tabName === 'Market' || tabName === 'Dashboard') {
-                setTimeout(drawCharts, 10);
+                setTimeout(() => { drawCharts(); resizeAllPlots(); }, 10);
             }
         }
 
@@ -704,7 +812,7 @@ margin: 10px 0;
                 responsive: true
             };
 
-            Plotly.newPlot('dashboard-chart-1', [trace_revenue], layout, { displayModeBar: false });
+            Plotly.newPlot('dashboard-chart-1', [trace_revenue], layout, PLOTLY_CONFIG);
         }
 
         // --- TAB 1 CHART 2 (Unchanged) ---
@@ -734,7 +842,7 @@ margin: 10px 0;
                 responsive: true
             };
 
-            Plotly.newPlot('dashboard-chart-2', [trace_margin], layout, { displayModeBar: false });
+            Plotly.newPlot('dashboard-chart-2', [trace_margin], layout, PLOTLY_CONFIG);
         }
 
         // ==========================================================
@@ -762,7 +870,7 @@ margin: 10px 0;
                 responsive: true
             };
 
-            Plotly.newPlot('financial-chart-1', [trace1, trace2, trace3], layout);
+            Plotly.newPlot('financial-chart-1', [trace1, trace2, trace3], layout, PLOTLY_CONFIG);
             return { HOG: HOG_indexed, BMW: BMW_indexed, YAMHF: YAMHF_indexed };
         }
 
@@ -787,7 +895,7 @@ margin: 10px 0;
                 responsive: true
             };
 
-            Plotly.newPlot('financial-chart-2', [trace1, trace2, trace3], layout);
+            Plotly.newPlot('financial-chart-2', [trace1, trace2, trace3], layout, PLOTLY_CONFIG);
             return { HOG: HOG_margin, BMW: BMW_margin, YAMHF: YAMHF_margin };
         }
 
@@ -815,7 +923,7 @@ margin: 10px 0;
                 responsive: true
             };
 
-            Plotly.newPlot('financial-chart-3', [trace1, trace2, trace3], layout);
+            Plotly.newPlot('financial-chart-3', [trace1, trace2, trace3], layout, PLOTLY_CONFIG);
             return { HOG: HOG_roe, BMW: BMW_roe, YAMHF: YAMHF_roe };
         }
         
@@ -908,7 +1016,7 @@ margin: 10px 0;
                 },
                 yaxis: { title: 'Index Value (Base 2021 = 100)' },
                 responsive: true
-            });
+            }, PLOTLY_CONFIG);
 
             // CHART 7: Market Tab - Trading Volume (HOG only)
             const trace7 = {
@@ -928,7 +1036,7 @@ margin: 10px 0;
                 },
                 yaxis: { title: 'Volume' },
                 responsive: true
-            });
+            }, PLOTLY_CONFIG);
             
             // Update market result text after charts are drawn
             updateMarketResultText(indexed_close_hog, indexed_close_bmw, indexed_close_yamhf, stock_volume);
@@ -939,6 +1047,7 @@ margin: 10px 0;
             document.getElementById("Dashboard").style.display = "block";
             document.querySelector(".tab-button").classList.add("active");
             drawCharts(); // Render visualisations upon loading
+            window.addEventListener('resize', () => { resizeAllPlots(); });
         });
 
     </script>
