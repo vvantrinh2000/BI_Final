@@ -123,6 +123,38 @@ border-bottom: 2px solid #ccc;
 padding-bottom: 5px;
 margin-top: 30px;
 }
+/* =========================
+   Boxed Insights Section
+   ========================= */
+.centered-insights {
+  max-width: 1000px;
+  margin: 40px auto;          /* tạo khoảng cách với section khác */
+  padding: 28px 32px;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 10px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* Center titles */
+.centered-insights h2,
+.centered-insights h3 {
+  text-align: center;
+  margin-top: 0;
+}
+
+/* Clean bullet layout */
+.centered-insights ul {
+  list-style-position: inside;
+  padding-left: 0;
+  margin: 16px auto;
+}
+
+/* Improve readability */
+.centered-insights li {
+  margin-bottom: 12px;
+  line-height: 1.6;
+}
 
 /* Updated ID for full-width charts if needed, but now using chart-grid */
 @media (max-width: 768px) {
@@ -300,6 +332,7 @@ margin: 10px 0;
             <div id="dashboard-chart-2"></div> <!-- Operating Margin Trend -->
         </div>
 
+        <div class="centered-insights">
         <!-- ================= KEY FINDINGS ================= -->
         <h3 class="section-title">
             Key Findings
@@ -343,6 +376,7 @@ margin: 10px 0;
                     </li>
                 </ul>
             </div>
+        </div>
         </div>
     </div>
     <!-- Tab 2: Business Context & Story (Unchanged) -->
@@ -412,7 +446,7 @@ margin: 10px 0;
     <!-- Tab 3: Data & Methodology (Unchanged) -->
     <div id="DataMethodology" class="tab-content">
         <h2>Data Acquisition, Governance & Technical Skills</h2>
-        <h3 class="section-title">1️. Data Sources</h3>
+        <h3 class="section-title">1. Data Sources</h3>
         <p>This project uses publicly available financial and market data to analyse Harley-Davidson’s recent performance.
         Primary data sources include:
         <ul>
